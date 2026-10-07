@@ -3,8 +3,6 @@
 
   const defaultLabels = Object.freeze({
     hint: 'Watch a rewarded video for a clue',
-    next: '<path d="M5 12h14"/><path d="m13 6 6 6-6 6"/>',
-    check: '<path d="m5 12.5 4.5 4.5L19 7.5"/>',
     board: 'Crossword board',
     rack: 'Letter tiles',
     cell: 'Crossword cell',
@@ -18,6 +16,8 @@
   });
 
   const icons = {
+    next: '<path d="M5 12h14"/><path d="m13 6 6 6-6 6"/>',
+    check: '<path d="m5 12.5 4.5 4.5L19 7.5"/>',
     play: '<path d="m9 6 10 6-10 6Z"/>',
     bulb: '<path d="M9 18h6"/><path d="M10 22h4"/><path d="M8.3 14.8A6 6 0 1 1 15.7 14.8C14.6 15.6 14 16.4 14 18h-4c0-1.6-.6-2.4-1.7-3.2Z"/>',
   };
