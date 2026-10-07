@@ -2,20 +2,13 @@
   'use strict';
 
   const defaultLabels = Object.freeze({
-    mute: 'Mute sound',
-    unmute: 'Unmute sound',
-    pause: 'Pause game',
-    resume: 'Resume game',
-    shuffle: 'Shuffle letters',
     hint: 'Watch a rewarded video for a clue',
     next: '<path d="M5 12h14"/><path d="m13 6 6 6-6 6"/>',
     check: '<path d="m5 12.5 4.5 4.5L19 7.5"/>',
-    erase: 'Erase selected tile',
     board: 'Crossword board',
     rack: 'Letter tiles',
     cell: 'Crossword cell',
     tile: 'Letter tile',
-    progress: 'Puzzle progress',
     clock: 'Elapsed time',
     tabs: 'Crosswords',
     tab: 'Crossword',
@@ -25,13 +18,8 @@
   });
 
   const icons = {
-    volume: '<path d="M5 9v6h4l5 4V5L9 9H5Z"/><path d="M17 9.5a4 4 0 0 1 0 5"/><path d="M19.5 7a7.5 7.5 0 0 1 0 10"/>',
-    muted: '<path d="M5 9v6h4l5 4V5L9 9H5Z"/><path d="m17 10 5 5m0-5-5 5"/>',
-    pause: '<path d="M9 5v14M15 5v14"/>',
     play: '<path d="m9 6 10 6-10 6Z"/>',
-    shuffle: '<path d="M4 7h3c4.5 0 5.5 10 10 10h3"/><path d="m17 14 3 3-3 3"/><path d="M4 17h3c1.7 0 2.8-1.4 3.8-3"/><path d="M13.2 10C14.2 8.4 15.3 7 17 7h3"/><path d="m17 4 3 3-3 3"/>',
     bulb: '<path d="M9 18h6"/><path d="M10 22h4"/><path d="M8.3 14.8A6 6 0 1 1 15.7 14.8C14.6 15.6 14 16.4 14 18h-4c0-1.6-.6-2.4-1.7-3.2Z"/>',
-    erase: '<path d="m4 15 8-9 8 8-6 6H8l-4-5Z"/><path d="m9 10 7 7"/><path d="M13 20h8"/>',
   };
 
   function svgIcon(name) {
@@ -50,12 +38,6 @@
 
   function glyphText(value) {
     return Array.from(String(value || '').trim()).slice(0, 2).join('');
-  }
-
-  function clampProgress(progress) {
-    const total = Math.max(1, Math.min(9, Number(progress && progress.total) || 5));
-    const current = Math.max(0, Math.min(total - 1, Number(progress && progress.current) || 0));
-    return { current, total };
   }
 
   function normalizeTabs(tabs) {
@@ -103,11 +85,8 @@
         return normalizeCell((settings.cells || [])[index]);
       }),
       rack: Array.from(settings.rack || [], function (letter) { return String(letter || ''); }),
-      progress: clampProgress(settings.progress),
       selectedRackIndex: -1,
       selectedCellIndex: -1,
-      muted: Boolean(settings.muted),
-      paused: Boolean(settings.paused),
       hintBusy: false,
       tabs: normalizeTabs(settings.tabs),
       activeTab: 0,
@@ -125,12 +104,7 @@
     root.innerHTML = [
       '<div class="cw-app">',
         '<header class="cw-topbar">',
-          '<div class="cw-progress" role="progressbar"></div>',
           '<div class="cw-clock" role="timer"></div>',
-          '<div class="cw-top-actions">',
-            '<button class="cw-action" type="button" data-action="mute"></button>',
-            '<button class="cw-action" type="button" data-action="pause"></button>',
-          '</div>',
         '</header>',
         '<nav class="cw-tabs"></nav>',
         '<main class="cw-stage">',
@@ -138,9 +112,7 @@
           '<aside class="cw-dock">',
             '<div class="cw-rack" role="listbox"></div>',
             '<div class="cw-controls">',
-              '<button class="cw-action" type="button" data-action="shuffle"></button>',
               '<button class="cw-action cw-action--hint" type="button" data-action="hint"></button>',
-              '<button class="cw-action" type="button" data-action="erase"></button>',
             '</div>',
           '</aside>',
         '</main>',
@@ -150,12 +122,9 @@
 
     const board = root.querySelector('.cw-board');
     const rack = root.querySelector('.cw-rack');
-    const progress = root.querySelector('.cw-progress');
     const clock = root.querySelector('.cw-clock');
     const tabsNav = root.querySelector('.cw-tabs');
     const overlay = root.querySelector('.cw-overlay');
-    const muteButton = root.querySelector('[data-action="mute"]');
-    const pauseButton = root.querySelector('[data-action="pause"]');
     const hintButton = root.querySelector('[data-action="hint"]');
 
     root.style.setProperty('--cw-columns', columns);
@@ -163,7 +132,6 @@
     root.style.setProperty('--cw-rows', rows);
     board.setAttribute('aria-label', labels.board);
     rack.setAttribute('aria-label', labels.rack);
-    progress.setAttribute('aria-label', labels.progress);
     clock.setAttribute('aria-label', labels.clock);
     tabsNav.setAttribute('aria-label', labels.tabs);
 
@@ -173,41 +141,8 @@
       onAction(type, payload);
     }
 
-    function actionButton(action, icon, label) {
-      const button = root.querySelector('[data-action="' + action + '"]');
-      button.innerHTML = svgIcon(icon);
-      button.setAttribute('aria-label', label);
-      return button;
-    }
-
-    actionButton('shuffle', 'shuffle', labels.shuffle);
-    actionButton('erase', 'erase', labels.erase);
     hintButton.innerHTML = svgIcon('bulb') + '<span class="cw-play-badge">' + svgIcon('play') + '</span>';
     hintButton.setAttribute('aria-label', labels.hint);
-
-    function renderTopActions() {
-      muteButton.innerHTML = svgIcon(state.muted ? 'muted' : 'volume');
-      muteButton.setAttribute('aria-label', state.muted ? labels.unmute : labels.mute);
-      muteButton.setAttribute('aria-pressed', String(state.muted));
-
-      pauseButton.innerHTML = svgIcon(state.paused ? 'play' : 'pause');
-      pauseButton.setAttribute('aria-label', state.paused ? labels.resume : labels.pause);
-      pauseButton.setAttribute('aria-pressed', String(state.paused));
-    }
-
-    function renderProgress() {
-      progress.replaceChildren();
-      progress.setAttribute('aria-valuemin', '0');
-      progress.setAttribute('aria-valuemax', String(state.progress.total));
-      progress.setAttribute('aria-valuenow', String(state.progress.current + 1));
-      for (let index = 0; index < state.progress.total; index += 1) {
-        const dot = document.createElement('span');
-        dot.className = 'cw-progress-dot';
-        if (index < state.progress.current) dot.classList.add('is-done');
-        if (index === state.progress.current) dot.classList.add('is-current');
-        progress.append(dot);
-      }
-    }
 
     function renderBoard() {
       board.replaceChildren();
@@ -274,7 +209,7 @@
     }
 
     function tickRunning() {
-      return !state.blocked && !state.paused && !state.completed;
+      return !state.blocked && !state.completed;
     }
 
     function startClock() {
@@ -307,8 +242,6 @@
     function renderAll() {
       renderClock();
       renderTabs();
-      renderTopActions();
-      renderProgress();
       renderBoard();
       renderRack();
       hintButton.disabled = state.hintBusy;
@@ -349,23 +282,8 @@
       if (!action || !root.contains(action)) return;
       if (action.dataset.action === 'next') {
         goNext(action);
-      } else if (action.dataset.action === 'mute') {
-        state.muted = !state.muted;
-        renderTopActions();
-        emit('mute', { muted: state.muted });
-      } else if (action.dataset.action === 'pause') {
-        state.paused = !state.paused;
-        renderTopActions();
-        emit('pause', { paused: state.paused });
-      } else if (action.dataset.action === 'shuffle') {
-        state.rack = state.rack.slice().sort(function () { return Math.random() - .5; });
-        state.selectedRackIndex = -1;
-        renderRack();
-        emit('shuffle', { rack: state.rack.slice() });
       } else if (action.dataset.action === 'hint') {
         requestHint();
-      } else if (action.dataset.action === 'erase') {
-        emit('erase', { cellIndex: state.selectedCellIndex });
       }
     }
 
@@ -446,18 +364,6 @@
         state.selectedRackIndex = -1;
         renderRack();
       },
-      setProgress: function setProgress(next) {
-        state.progress = clampProgress(next);
-        renderProgress();
-      },
-      setMuted: function setMuted(value) {
-        state.muted = Boolean(value);
-        renderTopActions();
-      },
-      setPaused: function setPaused(value) {
-        state.paused = Boolean(value);
-        renderTopActions();
-      },
       setHintBusy: setHintBusy,
       setTabs: function setTabs(tabs, active) {
         state.tabs = normalizeTabs(tabs);
@@ -503,7 +409,6 @@
         columns: 8,
         cells: demoCells(),
         rack: ['A', 'E', 'L', 'N', 'R', 'S', 'T'],
-        progress: { current: 2, total: 5 },
         onAction: function (type) { if (type === 'next') window.console.info('next level'); },
       });
     });

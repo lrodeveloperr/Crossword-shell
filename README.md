@@ -6,7 +6,7 @@ A reusable, dependency-free crossword UI for Playgama games and YouTube Playable
 
 - Full-viewport portrait and landscape layout using `dvh`, safe-area insets, and height-bounded boards.
 - An 8 x 7 board by default, configurable to any row and column count.
-- Letter rack, progress dots, pause, mute, shuffle, rewarded-clue, and erase controls.
+- Letter rack, clock, crossword tabs, and a rewarded-clue button. Mute, pause, shuffle, erase, and progress dots are intentionally not included.
 - A small JavaScript API plus `crossword:*` events for game-engine integration.
 - Keyboard focus, 44 px minimum controls, reduced-motion support, and no external assets.
 
@@ -40,7 +40,6 @@ const shell = window.CrosswordShell.mount(
     columns: 8,
     cells,
     rack: ['A', 'E', 'L', 'N', 'R', 'S', 'T'],
-    progress: { current: 2, total: 5 },
     labels: localizedControlLabels,
     onAction(type, detail) {
       gameController.handleShellAction(type, detail);
@@ -62,9 +61,6 @@ Methods returned by `mount`:
 
 - `setBoard(cells)`
 - `setRack(letters)`
-- `setProgress({ current, total })`
-- `setMuted(boolean)`
-- `setPaused(boolean)`
 - `setHintBusy(boolean)`
 - `destroy()`
 
@@ -72,15 +68,11 @@ Events are dispatched from the mount element and also passed to `onAction`:
 
 - `crossword:cell`
 - `crossword:tile`
-- `crossword:shuffle`
 - `crossword:hint`
-- `crossword:erase`
-- `crossword:pause`
-- `crossword:mute`
 
 ## Clock, tabs, and ad breaks
 
-- A clock is always shown top centre. It pauses with the game and during ads (`setTime(seconds)` to restore).
+- A clock is always shown top centre. It stops during ads and on the complete screen (`setTime(seconds)` to restore).
 - Two rows of crossword tabs (`tabs: [{ id, label, done }]`, `activeTab`) emit `crossword:tab`.
 - A preroll always runs before the board is shown, then `crossword:ready` fires.
 - Hints always run a rewarded video. `crossword:hintreward` fires only on a confirmed reward; otherwise `crossword:hintfail`.

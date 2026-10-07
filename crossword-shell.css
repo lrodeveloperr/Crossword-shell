@@ -65,13 +65,10 @@ button { font: inherit; }
 
 .cw-topbar {
   min-height: clamp(42px, 7vmin, 58px);
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  display: flex;
+  justify-content: center;
   align-items: center;
-  gap: 14px;
 }
-
-.cw-top-actions { justify-self: end; }
 
 .cw-clock {
   justify-self: center;
@@ -117,31 +114,6 @@ button { font: inherit; }
 
 .cw-tab:focus-visible { outline: 3px solid var(--cw-gold); outline-offset: 2px; }
 
-.cw-progress {
-  min-width: 0;
-  display: flex;
-  align-items: center;
-  gap: clamp(6px, 1.1vmin, 10px);
-}
-
-.cw-progress-dot {
-  width: clamp(9px, 1.6vmin, 14px);
-  aspect-ratio: 1;
-  border-radius: 999px;
-  background: #2b4a65;
-  box-shadow: inset 0 1px 0 rgb(255 255 255 / 8%);
-}
-
-.cw-progress-dot.is-done { background: var(--cw-mint); }
-
-.cw-progress-dot.is-current {
-  width: clamp(30px, 5vmin, 48px);
-  aspect-ratio: auto;
-  height: clamp(9px, 1.6vmin, 14px);
-  background: var(--cw-gold);
-}
-
-.cw-top-actions,
 .cw-controls {
   display: flex;
   align-items: center;
@@ -180,7 +152,6 @@ button { font: inherit; }
   outline-offset: 3px;
 }
 
-.cw-action[aria-pressed="true"] { color: var(--cw-gold); }
 .cw-action:disabled { cursor: wait; filter: saturate(.35); opacity: .72; }
 
 .cw-action svg {
