@@ -25,6 +25,15 @@ for (const event of ['cell', 'tile', 'shuffle', 'hint', 'erase', 'pause', 'mute'
   assert.match(js, new RegExp("emit\\('" + event + "'"), 'missing crossword:' + event);
 }
 
+for (const event of ['tab', 'hintreward', 'complete', 'next', 'ready']) {
+  assert.match(js, new RegExp("emit\\('" + event + "'"), 'missing crossword:' + event);
+}
+assert.match(js, /cw-clock/);
+assert.match(js, /runAd\('preroll'\)/);
+assert.match(js, /runAd\('interstitial'\)/);
+assert.match(js, /runAd\('rewarded'\)/);
+assert.match(css, /container-type: size/);
+
 for (const forbidden of ['local' + 'Storage', 'session' + 'Storage', 'indexed' + 'DB', 'Bridge.']) {
   assert.equal(js.includes(forbidden), false, 'runtime must not contain ' + forbidden);
 }

@@ -78,6 +78,16 @@ Events are dispatched from the mount element and also passed to `onAction`:
 - `crossword:pause`
 - `crossword:mute`
 
+## Clock, tabs, and ad breaks
+
+- A clock is always shown top centre. It pauses with the game and during ads (`setTime(seconds)` to restore).
+- Two rows of crossword tabs (`tabs: [{ id, label, done }]`, `activeTab`) emit `crossword:tab`.
+- A preroll always runs before the board is shown, then `crossword:ready` fires.
+- Hints always run a rewarded video. `crossword:hintreward` fires only on a confirmed reward; otherwise `crossword:hintfail`.
+- Call `shell.complete()` when solved: a Next button appears, and pressing it runs an interstitial, then `crossword:next`.
+
+Pass `ads: { preroll, rewarded, interstitial }` to `mount`; each returns a promise (`rewarded` must resolve `false` unless a reward was confirmed). Without it, textless placeholder ad breaks are used for previews.
+
 ## Rewarded clue contract
 
 `crossword:hint` is only a request. The game must call its existing Playgama client wrapper, wait for a confirmed reward, update the puzzle state, then call `setBoard`. Never grant a clue on ad open, close, skip, or failure.
