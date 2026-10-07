@@ -4,9 +4,7 @@
   const defaultLabels = Object.freeze({
     hint: 'Watch a rewarded video for a clue',
     board: 'Crossword board',
-    rack: 'Letter tiles',
     cell: 'Crossword cell',
-    tile: 'Letter tile',
     clock: 'Elapsed time',
     tabs: 'Crosswords',
     tab: 'Crossword',
@@ -84,8 +82,6 @@
       cells: Array.from({ length: rows * columns }, function (_, index) {
         return normalizeCell((settings.cells || [])[index]);
       }),
-      rack: Array.from(settings.rack || [], function (letter) { return String(letter || ''); }),
-      selectedRackIndex: -1,
       selectedCellIndex: -1,
       hintBusy: false,
       tabs: normalizeTabs(settings.tabs),
@@ -110,7 +106,6 @@
         '<main class="cw-stage">',
           '<div class="cw-board-wrap"><div class="cw-board" role="grid"></div></div>',
           '<aside class="cw-dock">',
-            '<div class="cw-rack" role="listbox"></div>',
             '<div class="cw-controls">',
               '<button class="cw-action cw-action--hint" type="button" data-action="hint"></button>',
             '</div>',
@@ -121,7 +116,6 @@
     ].join('');
 
     const board = root.querySelector('.cw-board');
-    const rack = root.querySelector('.cw-rack');
     const clock = root.querySelector('.cw-clock');
     const tabsNav = root.querySelector('.cw-tabs');
     const overlay = root.querySelector('.cw-overlay');
@@ -131,7 +125,6 @@
     root.classList.add('is-gated');
     root.style.setProperty('--cw-rows', rows);
     board.setAttribute('aria-label', labels.board);
-    rack.setAttribute('aria-label', labels.rack);
     clock.setAttribute('aria-label', labels.clock);
     tabsNav.setAttribute('aria-label', labels.tabs);
 
@@ -166,23 +159,6 @@
           if (index === state.selectedCellIndex) button.classList.add('is-selected');
         }
         board.append(button);
-      });
-    }
-
-    function renderRack() {
-      rack.replaceChildren();
-      root.style.setProperty('--cw-rack-count', Math.max(1, state.rack.length));
-      state.rack.forEach(function (letter, index) {
-        const button = document.createElement('button');
-        button.type = 'button';
-        button.className = 'cw-rack-tile';
-        button.dataset.index = String(index);
-        button.setAttribute('role', 'option');
-        button.setAttribute('aria-label', labels.tile + ' ' + letter);
-        button.setAttribute('aria-selected', String(index === state.selectedRackIndex));
-        button.textContent = glyphText(letter);
-        if (index === state.selectedRackIndex) button.classList.add('is-selected');
-        rack.append(button);
       });
     }
 
@@ -243,7 +219,6 @@
       renderClock();
       renderTabs();
       renderBoard();
-      renderRack();
       hintButton.disabled = state.hintBusy;
       hintButton.setAttribute('aria-busy', String(state.hintBusy));
     }
@@ -254,14 +229,6 @@
         state.selectedCellIndex = Number(cell.dataset.index);
         renderBoard();
         emit('cell', { index: state.selectedCellIndex, cell: state.cells[state.selectedCellIndex] });
-        return;
-      }
-
-      const tile = event.target.closest('.cw-rack-tile');
-      if (tile && root.contains(tile)) {
-        state.selectedRackIndex = Number(tile.dataset.index);
-        renderRack();
-        emit('tile', { index: state.selectedRackIndex, letter: state.rack[state.selectedRackIndex] });
         return;
       }
 
@@ -359,11 +326,6 @@
         state.selectedCellIndex = -1;
         renderBoard();
       },
-      setRack: function setRack(letters) {
-        state.rack = Array.from(letters || [], function (letter) { return String(letter || ''); });
-        state.selectedRackIndex = -1;
-        renderRack();
-      },
       setHintBusy: setHintBusy,
       setTabs: function setTabs(tabs, active) {
         state.tabs = normalizeTabs(tabs);
@@ -408,7 +370,6 @@
         rows: 7,
         columns: 8,
         cells: demoCells(),
-        rack: ['A', 'E', 'L', 'N', 'R', 'S', 'T'],
         onAction: function (type) { if (type === 'next') window.console.info('next level'); },
       });
     });

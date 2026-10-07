@@ -6,7 +6,7 @@ A reusable, dependency-free crossword UI for Playgama games and YouTube Playable
 
 - Full-viewport portrait and landscape layout using `dvh`, safe-area insets, and height-bounded boards.
 - An 8 x 7 board by default, configurable to any row and column count.
-- Letter rack, clock, crossword tabs, and a rewarded-clue button. Mute, pause, shuffle, erase, and progress dots are intentionally not included.
+- Clock, crossword tabs, and a rewarded-clue button. The letter rack, mute, pause, shuffle, erase, and progress dots are intentionally not included.
 - A small JavaScript API plus `crossword:*` events for game-engine integration.
 - Keyboard focus, 44 px minimum controls, reduced-motion support, and no external assets.
 
@@ -39,7 +39,6 @@ const shell = window.CrosswordShell.mount(
     rows: 7,
     columns: 8,
     cells,
-    rack: ['A', 'E', 'L', 'N', 'R', 'S', 'T'],
     labels: localizedControlLabels,
     onAction(type, detail) {
       gameController.handleShellAction(type, detail);
@@ -60,14 +59,12 @@ null                         // outside the crossword
 Methods returned by `mount`:
 
 - `setBoard(cells)`
-- `setRack(letters)`
 - `setHintBusy(boolean)`
 - `destroy()`
 
 Events are dispatched from the mount element and also passed to `onAction`:
 
 - `crossword:cell`
-- `crossword:tile`
 - `crossword:hint`
 
 ## Clock, tabs, and ad breaks

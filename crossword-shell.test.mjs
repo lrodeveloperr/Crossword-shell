@@ -21,7 +21,7 @@ assert.match(css, /prefers-reduced-motion/);
 assert.match(js, /settings\.rows\) \|\| 7/);
 assert.match(js, /settings\.columns\) \|\| 8/);
 
-for (const event of ['cell', 'tile', 'hint']) {
+for (const event of ['cell', 'hint']) {
   assert.match(js, new RegExp("emit\\('" + event + "'"), 'missing crossword:' + event);
 }
 
@@ -34,7 +34,7 @@ assert.match(js, /runAd\('interstitial'\)/);
 assert.match(js, /runAd\('rewarded'\)/);
 assert.match(css, /container-type: size/);
 
-for (const removed of ['mute', 'pause', 'shuffle', 'erase', 'cw-progress']) {
+for (const removed of ['mute', 'pause', 'shuffle', 'erase', 'cw-progress', 'cw-rack', 'setRack']) {
   assert.equal(js.includes(removed), false, 'template must not contain ' + removed);
 }
 
