@@ -49,7 +49,7 @@ button { font: inherit; }
 
 .cw-app {
   width: 100%;
-  max-width: 1320px;
+  max-width: none;
   height: 100%;
   margin: 0 auto;
   padding:
@@ -339,6 +339,9 @@ button { font: inherit; }
 .cw-sprite { position: absolute; width: 0; height: 0; overflow: hidden; }
 
 @media (min-aspect-ratio: 4 / 3) {
+  .cw-tabs { width: min(100%, 720px); justify-self: center; }
+  .cw-tab { min-height: 28px; }
+
   .cw-stage {
     grid-template-columns: minmax(0, 1fr) clamp(150px, 20vw, 260px);
     grid-template-rows: minmax(0, 1fr);
@@ -360,6 +363,23 @@ button { font: inherit; }
 
   .cw-rack-tile { font-size: clamp(.9rem, 3vmin, 1.8rem); }
   .cw-controls { flex-wrap: wrap; }
+}
+
+@media (min-aspect-ratio: 4 / 3) and (min-height: 560px) {
+  .cw-app {
+    grid-template-columns: minmax(0, 1fr) clamp(240px, 24vw, 380px);
+    grid-template-rows: auto auto minmax(0, 1fr);
+    grid-template-areas: "top top" "board tabs" "board dock";
+    column-gap: clamp(12px, 2vw, 32px);
+  }
+
+  .cw-stage { display: contents; }
+  .cw-topbar { grid-area: top; }
+  .cw-board-wrap { grid-area: board; }
+  .cw-tabs { grid-area: tabs; width: 100%; justify-self: stretch; }
+  .cw-tab { min-height: 36px; }
+  .cw-dock { grid-area: dock; }
+  .cw-rack-tile { font-size: clamp(1rem, 2.4vw, 2rem); }
 }
 
 @media (min-aspect-ratio: 4 / 3) and (max-height: 500px) {
